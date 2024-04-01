@@ -1,7 +1,41 @@
+using Microsoft.EntityFrameworkCore;
+using BusManagementSystem.Models;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
+
+
 var builder = WebApplication.CreateBuilder(args);
+var folder = Environment.SpecialFolder.LocalApplicationData;
+var path = Environment.GetFolderPath(folder);
+var dbPath = Path.Join(path, "Bus.db");
+var connectionString = builder.Configuration.GetConnectionString("Bus") ?? "Data Source=Bus.db";
+
+// builder.Services.AddDbContext<BusContext>(options => options.UseSqlite($"Data Source={dbPath}"));
+
+builder.Services.AddDbContext<BusContext>(options =>
+    options.UseSqlite(connectionString));
+
 
 // Add services to the container.
 builder.Services.AddControllersWithViews();
+
+builder.Services.AddDefaultIdentity<Driver>()
+    .AddRoles<IdentityRole>()
+    .AddEntityFrameworkStores<BusContext>();
+
+builder.Services.AddAuthorization(options =>
+{
+    options.AddPolicy("ManagerOnly", policy =>
+        policy.RequireClaim("IsManager", "true"));
+    options.AddPolicy("ActiveOnly", policy =>
+        policy.RequireAssertion(context =>
+            context.User.HasClaim("IsActive", "true") || context.User.HasClaim("IsManager", "true")));
+});
+
+builder.Services.ConfigureApplicationCookie(options =>
+{
+    options.LoginPath = "/User/Login";
+});
 
 var app = builder.Build();
 
@@ -20,8 +54,6 @@ app.UseRouting();
 
 app.UseAuthorization();
 
-app.MapControllerRoute(
-    name: "default",
-    pattern: "{controller=Home}/{action=Index}/{id?}");
+app.MapDefaultControllerRoute();
 
 app.Run();
