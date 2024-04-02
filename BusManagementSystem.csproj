@@ -17,4 +17,10 @@
     <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="8.0.3" />
   </ItemGroup>
 
+  <ItemGroup>
+    <_ContentIncludedByDefault Remove="Views\Driver\Edit.cshtml" />
+    <_ContentIncludedByDefault Remove="Views\Driver\Index.cshtml" />
+    <_ContentIncludedByDefault Remove="Views\Loop\Index.cshtml" />
+  </ItemGroup>
+
 </Project>

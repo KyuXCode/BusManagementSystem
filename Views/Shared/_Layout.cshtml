@@ -32,29 +32,29 @@
                             var isManager = bool.Parse(User.FindFirst("IsManager")?.Value ?? "false");
                             if (isManager)
                             {
-                                <li class="nav-item">
-                                    <a class="nav-link text-dark" asp-controller="Bus" asp-action="Index">Driver</a>
-                                </li>
+                                @* <li class="nav-item"> *@
+                                @*     <a class="nav-link text-dark" asp-controller="Driver" asp-action="Index">Driver</a> *@
+                                @* </li> *@
                                 
                                 <li class="nav-item">
                                     <a class="nav-link text-dark" asp-controller="Bus" asp-action="Index">Bus</a>
                                 </li>
                                 
                                 <li class="nav-item">
-                                    <a class="nav-link text-dark" asp-controller="Bus" asp-action="Index">Entry</a>
+                                    <a class="nav-link text-dark" asp-controller="Stop" asp-action="Index">Stop</a>
                                 </li>
                                 
-                                <li class="nav-item">
-                                    <a class="nav-link text-dark" asp-controller="Bus" asp-action="Index">Route</a>
-                                </li>
+                                @* <li class="nav-item"> *@
+                                @*     <a class="nav-link text-dark" asp-controller="Entry" asp-action="Index">Entry</a> *@
+                                @* </li> *@
                                 
-                                <li class="nav-item">
-                                    <a class="nav-link text-dark" asp-controller="Bus" asp-action="Index">Loop</a>
-                                </li>
+                                @* <li class="nav-item"> *@
+                                @*     <a class="nav-link text-dark" asp-controller="Route" asp-action="Index">Route</a> *@
+                                @* </li> *@
                                 
-                                <li class="nav-item">
-                                    <a class="nav-link text-dark" asp-controller="Bus" asp-action="Index">Stop</a>
-                                </li>
+                                @* <li class="nav-item"> *@
+                                @*     <a class="nav-link text-dark" asp-controller="Loop" asp-action="Index">Loop</a> *@
+                                @* </li> *@
                                 
                                 
                                 

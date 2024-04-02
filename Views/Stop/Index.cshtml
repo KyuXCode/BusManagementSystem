@@ -1,0 +1,51 @@
+@model IEnumerable<BusManagementSystem.Models.Stop>
+
+@{
+    ViewData["Title"] = "Stops";
+    <link rel="stylesheet" href="~/css/stop_index.css"/>
+}
+
+<div>
+    <div id="stop-index-header">
+        <h1>Stops</h1>
+        <div id="buttons">
+            <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#createStopModal">Create Stop</button>
+        </div>
+    </div>
+    <hr id="separator">
+    <table id="stop-table" class="table table-striped">
+        <thead>
+        <tr>
+            <th>Stop Name</th>
+            <th>Latitude</th>
+            <th>Longitude</th>
+            <th>Actions</th>
+        </tr>
+        </thead>
+        <tbody>
+        @foreach (var stop in Model)
+        {
+            <tr>
+                <td>@stop.Name</td>
+                <td>@stop.Latitude</td>
+                <td>@stop.Longitude</td>
+                <td>
+                    <a class="btn btn-primary" asp-action="Edit" asp-route-id="@stop.StopId">Edit</a> |
+                    <a class="btn btn-danger" asp-action="Edit" asp-route-id="@stop.StopId">Delete</a>
+                </td>
+            </tr>
+        }
+        </tbody>
+    </table>
+</div>
+
+<!-- Create Stop Modal -->
+@await Html.PartialAsync("_CreateStopModal", new BusManagementSystem.Models.Stop())
+
+<!-- Delete Stop Modal -->
+@* @await Html.PartialAsync("_DeleteStopModal") *@
+
+@section Scripts {
+    @{ await Html.RenderPartialAsync("_ValidationScriptsPartial"); }
+    <script src="./js/stop_actions.js"></script>
+}

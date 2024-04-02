@@ -26,25 +26,30 @@ function submitNewBus() {
 }
 
 function deleteSelectedBuses() {
-    $.ajax({
-        type: "POST",
-        url: "/Bus/Delete",
-        data: { ids: selectedBusIds },
-        traditional: true,
-        success: function (response) {
-            $("#selectAllCheckbox").prop('checked', false);
-            $('input[name="busCheckbox"]').prop('checked', false);
-            var deleteBusModal = new bootstrap.Modal(document.getElementById('deleteBusModal'));
-            deleteBusModal.hide();
-            location.reload();
-        },
-        error: function (response) {
-            console.error("Error while deleting the buses:", response);
-        },
+    var selectedBusIds = [];
+    $('input[name="busCheckbox"]:checked').each(function() {
+        selectedBusIds.push($(this).val());
     });
 
-    console.log(selectedBusIds)
+    $('#deleteForm').submit();
 }
+
+function deleteBus(busId) {
+    if (confirm('Are you sure you want to delete this bus?')) {
+        $.ajax({
+            url: '/Bus/Delete/' + busId,
+            type: 'POST',
+            success: function (response) {
+                // Reload the page or update the bus list
+                location.reload();
+            },
+            error: function (xhr, status, error) {
+                console.error('Error deleting bus:', error);
+            }
+        });
+    }
+}
+
 
 function editBus() {
     var formData = $("#editBusForm").serialize();

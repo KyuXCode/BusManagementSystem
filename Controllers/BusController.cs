@@ -41,23 +41,72 @@ public class BusController : Controller
     }
 
 
-    //Update
-    [HttpPost, ActionName("Edit")]
-    public async Task<IActionResult> Edit(Bus bus)
+    // //Update
+    // [HttpPost, ActionName("Edit")]
+    // public async Task<IActionResult> Edit(Bus bus)
+    // {
+    //     var foundBus = await _context.Buses.FindAsync(bus.BusId);
+    //
+    //     if (foundBus == null)
+    //     {
+    //         throw new Exception("Bus not found");
+    //     }
+    //
+    //     foundBus.BusNumber = bus.BusNumber;
+    //
+    //     _context.Entry(foundBus).State = EntityState.Modified;
+    //
+    //     await _context.SaveChangesAsync();
+    //
+    //     return RedirectToAction("Index");
+    // }
+
+    public IActionResult Edit(int id)
     {
-        var foundBus = await _context.Buses.FindAsync(bus.BusId);
-        
-        if (foundBus == null)
+        var bus = _context.Buses.FirstOrDefault(b => b.BusId == id);
+        if (bus == null)
         {
-            throw new Exception("Bus not found");
+            return NotFound();
         }
 
-        foundBus.BusNumber = bus.BusNumber;
+        return View(bus);
+    }
 
-        _context.Entry(foundBus).State = EntityState.Modified;
+    [HttpPost]
+    [ValidateAntiForgeryToken]
+    public async Task<IActionResult> Edit(int busId, [Bind("BusId, BusNumber")] Bus bus)
+    {
+        if (ModelState.IsValid)
+        {
+            var foundBus = _context.Buses.FirstOrDefault(b => b.BusId == busId);
+            if (foundBus != null)
+            {
+                foundBus.BusNumber = bus.BusNumber;
+                _context.SaveChanges();
+            }
 
+            return RedirectToAction("Index");
+        }
+        else
+        {
+            return View(bus);
+        }
+    }
+    
+
+    [HttpPost]
+    [ValidateAntiForgeryToken]
+    public async Task<IActionResult> Delete(int busId)
+    {
+        var selectedBus = await _context.Buses.FindAsync(busId);
+        if (selectedBus == null)
+        {
+            return NotFound();
+        }
+
+        _context.Buses.Remove(selectedBus);
         await _context.SaveChangesAsync();
 
         return RedirectToAction("Index");
-    }
+    }   
 }

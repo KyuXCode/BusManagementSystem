@@ -1,0 +1,38 @@
+@model BusManagementSystem.Models.Stop
+
+<link rel="stylesheet" href="~/css/stop_index.css" />
+
+<div class="modal fade" id="createStopModal" tabindex="-1" aria-labelledby="stopModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div id="stopModalContent" class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title fs-5" id="stopModalLabel">Create Stop</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form id="createStopForm" asp-action="Create">
+                    <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+                    <div id="stop-input" class="form-group">
+                        <label asp-for="Name" class="control-label">Stop Name: </label>
+                        <input type="text" placeholder="Enter stop name..." asp-for="Name" name="Name" class="form-control" />
+                        <span asp-validation-for="Name" class="text-danger"></span>
+                    </div>
+                    <div id="latitude-input" class="form-group">
+                        <label asp-for="Latitude" class="control-label">Latitude: </label>
+                        <input type="text" placeholder="Enter latitude..." asp-for="Latitude" name="Latitude" class="form-control" />
+                        <span asp-validation-for="Latitude" class="text-danger"></span>
+                    </div>
+                    <div id="longitude-input" class="form-group">
+                        <label asp-for="Longitude" class="control-label">Longitude: </label>
+                        <input type="text" placeholder="Enter longitude..." asp-for="Longitude" name="Longitude" class="form-control" />
+                        <span asp-validation-for="Longitude" class="text-danger"></span>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-primary" onclick="submitNewStop()">Create</button>
+            </div>
+        </div>
+    </div>
+</div>
