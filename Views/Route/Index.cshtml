@@ -1,0 +1,65 @@
+@using BusManagementSystem.Service
+@using Microsoft.AspNetCore.Mvc.TagHelpers
+@inject ILoopServiceInterface _loopServiceInterface
+@inject IStopServiceInterface _stopServiceInterface
+@model IEnumerable<BusManagementSystem.Models.Route>
+
+@{
+    <link rel="stylesheet" href="~/css/route_index.css"/>
+    var loopIdString = ViewContext.RouteData.Values["loopId"] as string;
+    var loopId = Convert.ToInt32(loopIdString);
+    var loop = await _loopServiceInterface.GetLoop(loopId);
+    ViewData["Title"] = loop.Name;
+}
+
+<div>
+    <div id="route-index-header">
+        <h1>@loop.Name Loop</h1>
+        <a class="btn btn-primary" asp-action="Create">Create New Route</a>
+    </div>
+    <hr id="separator">
+    <form id="deleteForm" asp-action="Delete" method="post">
+        <table id="bus-table" class="table table-striped">
+            <thead>
+            <tr>
+                <th>Loop</th>
+                <th>Stop</th>
+                <th>Order</th>
+            </tr>
+            </thead>
+            <tbody>
+            @foreach (var route in Model)
+            {
+                var stop = await _stopServiceInterface.GetStop(route.StopId);
+
+                <tr>
+                    <td>@loop.Name</td>
+                    <td>@stop.Name</td>
+                    <td>@route.Order</td>
+                    <td>
+                        <a class="btn btn-primary" asp-action="Edit" asp-route-id="@route.Id">Edit</a> |
+                        <button class="btn btn-danger" asp-action="Delete" asp-route-busId="@route.Id">
+                            Delete
+                        </button>
+                    </td>
+                </tr>
+            }
+            </tbody>
+        </table>
+    </form>
+</div>
+
+<!-- Create Bus Modal -->
+@* @await Html.PartialAsync("_CreateBusModal", new BusManagementSystem.Models.Bus()) *@
+
+@* <!-- Delete Bus Modal --> *@
+@* @await Html.PartialAsync("_DeleteBusModal") *@
+@* *@
+@* <!-- Edit Bus Modal --> *@
+@* @await Html.PartialAsync("_EditBusModal", new BusManagementSystem.Models.Bus()) *@
+
+
+@section Scripts {
+    @{ await Html.RenderPartialAsync("_ValidationScriptsPartial"); }
+    <script src="./js/bus_actions.js"></script>
+}

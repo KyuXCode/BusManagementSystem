@@ -4,66 +4,41 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using BusManagementSystem.Models;
 using BusManagementSystem.Service;
-using Microsoft.EntityFrameworkCore;
 
 namespace BusManagementSystem.Controllers;
 
 [Authorize(Policy = "ManagerOnly")]
 public class BusController : Controller
 {
-    private readonly BusContext _context;
+    private readonly IBusServiceInterface _busServiceInterface;
+    private readonly ILogger<BusController> _logger;
 
-    public BusController(BusContext context)
+    public BusController(IBusServiceInterface busServiceInterface, ILogger<BusController> logger)
     {
-        _context = context;
+        _busServiceInterface = busServiceInterface;
+        _logger = logger;
     }
 
     // GET: /Bus
     public IActionResult Index()
     {
-        var buses = _context.Buses.ToList();
+        var buses = _busServiceInterface.GetBuses();
         return View(buses);
     }
 
     //POST: 
-
     [HttpPost]
+    [ValidateAntiForgeryToken]
     public async Task<IActionResult> Create([Bind("Id,BusNumber")] Bus bus)
     {
-        if (ModelState.IsValid)
-        {
-            _context.Buses.Add(bus);
-            await _context.SaveChangesAsync();
-            return RedirectToAction("Index");
-        }
-
+        await _busServiceInterface.AddBus(bus);
         return RedirectToAction("Index");
     }
 
-
-    // //Update
-    // [HttpPost, ActionName("Edit")]
-    // public async Task<IActionResult> Edit(Bus bus)
-    // {
-    //     var foundBus = await _context.Buses.FindAsync(bus.BusId);
-    //
-    //     if (foundBus == null)
-    //     {
-    //         throw new Exception("Bus not found");
-    //     }
-    //
-    //     foundBus.BusNumber = bus.BusNumber;
-    //
-    //     _context.Entry(foundBus).State = EntityState.Modified;
-    //
-    //     await _context.SaveChangesAsync();
-    //
-    //     return RedirectToAction("Index");
-    // }
-
-    public IActionResult Edit(int id)
+    public async Task<IActionResult> Edit(int id)
     {
-        var bus = _context.Buses.FirstOrDefault(b => b.BusId == id);
+        var bus = await _busServiceInterface.GetBus(id);
+
         if (bus == null)
         {
             return NotFound();
@@ -74,39 +49,48 @@ public class BusController : Controller
 
     [HttpPost]
     [ValidateAntiForgeryToken]
-    public async Task<IActionResult> Edit(int busId, [Bind("BusId, BusNumber")] Bus bus)
+    public async Task<IActionResult> Edit(int id, [Bind("Id, BusNumber")] Bus bus)
     {
+        if (id != bus.Id)
+        {
+            _logger.LogWarning("Bus with id {busId} not found at {time}.", bus.Id, DateTime.Now);
+            return NotFound();
+        }
+
         if (ModelState.IsValid)
         {
-            var foundBus = _context.Buses.FirstOrDefault(b => b.BusId == busId);
-            if (foundBus != null)
+            try
             {
-                foundBus.BusNumber = bus.BusNumber;
-                _context.SaveChanges();
+                await _busServiceInterface.UpdateBus(bus);
+                _logger.LogInformation("Edited bus with id {id} at {time}", bus.Id, DateTime.Now);
+                return RedirectToAction("Index");
             }
+            catch (Exception e)
+            {
+                _logger.LogError("Edit Failed with exception {exception} at {time}.", e.Message, DateTime.Now);
+                return NotFound();
+            }
+        }
 
-            return RedirectToAction("Index");
-        }
-        else
-        {
-            return View(bus);
-        }
+        return View(bus);
     }
-    
+
 
     [HttpPost]
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> Delete(int busId)
     {
-        var selectedBus = await _context.Buses.FindAsync(busId);
-        if (selectedBus == null)
+        try
         {
+            await _busServiceInterface.DeleteBus(busId);
+            _logger.LogInformation("Deleted buss with ids {busId} at {time}", busId, DateTime.Now);
+        }
+        catch (Exception e)
+        {
+            _logger.LogError("Delete Bus failed with exception {exception} at {time}.", e.Message, DateTime.Now);
             return NotFound();
         }
 
-        _context.Buses.Remove(selectedBus);
-        await _context.SaveChangesAsync();
-
         return RedirectToAction("Index");
-    }   
+    }
 }

@@ -11,7 +11,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace BusManagementSystem.Migrations
 {
     [DbContext(typeof(BusContext))]
-    [Migration("20240401072246_InitialCreate")]
+    [Migration("20240412050339_InitialCreate")]
     partial class InitialCreate
     {
         /// <inheritdoc />
@@ -22,14 +22,14 @@ namespace BusManagementSystem.Migrations
 
             modelBuilder.Entity("BusManagementSystem.Models.Bus", b =>
                 {
-                    b.Property<int>("BusId")
+                    b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("INTEGER");
 
                     b.Property<int>("BusNumber")
                         .HasColumnType("INTEGER");
 
-                    b.HasKey("BusId");
+                    b.HasKey("Id");
 
                     b.ToTable("Buses");
                 });
@@ -45,9 +45,6 @@ namespace BusManagementSystem.Migrations
                     b.Property<string>("ConcurrencyStamp")
                         .IsConcurrencyToken()
                         .HasColumnType("TEXT");
-
-                    b.Property<int>("DriverId")
-                        .HasColumnType("INTEGER");
 
                     b.Property<string>("Email")
                         .IsRequired()
@@ -118,7 +115,7 @@ namespace BusManagementSystem.Migrations
 
             modelBuilder.Entity("BusManagementSystem.Models.Entry", b =>
                 {
-                    b.Property<int>("EntryId")
+                    b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("INTEGER");
 
@@ -128,7 +125,10 @@ namespace BusManagementSystem.Migrations
                     b.Property<int>("BusId")
                         .HasColumnType("INTEGER");
 
-                    b.Property<string>("DriverId")
+                    b.Property<int>("DriverId")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<string>("DriverId1")
                         .IsRequired()
                         .HasColumnType("TEXT");
 
@@ -144,11 +144,11 @@ namespace BusManagementSystem.Migrations
                     b.Property<DateTime>("Timestamp")
                         .HasColumnType("TEXT");
 
-                    b.HasKey("EntryId");
+                    b.HasKey("Id");
 
                     b.HasIndex("BusId");
 
-                    b.HasIndex("DriverId");
+                    b.HasIndex("DriverId1");
 
                     b.HasIndex("LoopId");
 
@@ -159,7 +159,7 @@ namespace BusManagementSystem.Migrations
 
             modelBuilder.Entity("BusManagementSystem.Models.Loop", b =>
                 {
-                    b.Property<int>("LoopId")
+                    b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("INTEGER");
 
@@ -167,14 +167,14 @@ namespace BusManagementSystem.Migrations
                         .IsRequired()
                         .HasColumnType("TEXT");
 
-                    b.HasKey("LoopId");
+                    b.HasKey("Id");
 
                     b.ToTable("Loops");
                 });
 
             modelBuilder.Entity("BusManagementSystem.Models.Route", b =>
                 {
-                    b.Property<int>("RouteId")
+                    b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("INTEGER");
 
@@ -187,7 +187,7 @@ namespace BusManagementSystem.Migrations
                     b.Property<int>("StopId")
                         .HasColumnType("INTEGER");
 
-                    b.HasKey("RouteId");
+                    b.HasKey("Id");
 
                     b.HasIndex("LoopId");
 
@@ -198,7 +198,7 @@ namespace BusManagementSystem.Migrations
 
             modelBuilder.Entity("BusManagementSystem.Models.Stop", b =>
                 {
-                    b.Property<int>("StopId")
+                    b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("INTEGER");
 
@@ -208,11 +208,21 @@ namespace BusManagementSystem.Migrations
                     b.Property<double>("Longitude")
                         .HasColumnType("REAL");
 
+                    b.Property<int?>("LoopId")
+                        .HasColumnType("INTEGER");
+
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasColumnType("TEXT");
 
-                    b.HasKey("StopId");
+                    b.Property<int?>("StopId")
+                        .HasColumnType("INTEGER");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("LoopId");
+
+                    b.HasIndex("StopId");
 
                     b.ToTable("Stops");
                 });
@@ -352,25 +362,25 @@ namespace BusManagementSystem.Migrations
             modelBuilder.Entity("BusManagementSystem.Models.Entry", b =>
                 {
                     b.HasOne("BusManagementSystem.Models.Bus", "Bus")
-                        .WithMany()
+                        .WithMany("Entries")
                         .HasForeignKey("BusId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.HasOne("BusManagementSystem.Models.Driver", "Driver")
-                        .WithMany()
-                        .HasForeignKey("DriverId")
+                        .WithMany("Entries")
+                        .HasForeignKey("DriverId1")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.HasOne("BusManagementSystem.Models.Loop", "Loop")
-                        .WithMany()
+                        .WithMany("Entries")
                         .HasForeignKey("LoopId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.HasOne("BusManagementSystem.Models.Stop", "Stop")
-                        .WithMany()
+                        .WithMany("Entries")
                         .HasForeignKey("StopId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -393,7 +403,7 @@ namespace BusManagementSystem.Migrations
                         .IsRequired();
 
                     b.HasOne("BusManagementSystem.Models.Stop", "Stop")
-                        .WithMany()
+                        .WithMany("Routes")
                         .HasForeignKey("StopId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -401,6 +411,17 @@ namespace BusManagementSystem.Migrations
                     b.Navigation("Loop");
 
                     b.Navigation("Stop");
+                });
+
+            modelBuilder.Entity("BusManagementSystem.Models.Stop", b =>
+                {
+                    b.HasOne("BusManagementSystem.Models.Loop", null)
+                        .WithMany("Stops")
+                        .HasForeignKey("LoopId");
+
+                    b.HasOne("BusManagementSystem.Models.Stop", null)
+                        .WithMany("Stops")
+                        .HasForeignKey("StopId");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>
@@ -454,9 +475,32 @@ namespace BusManagementSystem.Migrations
                         .IsRequired();
                 });
 
+            modelBuilder.Entity("BusManagementSystem.Models.Bus", b =>
+                {
+                    b.Navigation("Entries");
+                });
+
+            modelBuilder.Entity("BusManagementSystem.Models.Driver", b =>
+                {
+                    b.Navigation("Entries");
+                });
+
             modelBuilder.Entity("BusManagementSystem.Models.Loop", b =>
                 {
+                    b.Navigation("Entries");
+
                     b.Navigation("Routes");
+
+                    b.Navigation("Stops");
+                });
+
+            modelBuilder.Entity("BusManagementSystem.Models.Stop", b =>
+                {
+                    b.Navigation("Entries");
+
+                    b.Navigation("Routes");
+
+                    b.Navigation("Stops");
                 });
 #pragma warning restore 612, 618
         }

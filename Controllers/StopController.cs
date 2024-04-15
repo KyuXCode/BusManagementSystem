@@ -3,97 +3,93 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using BusManagementSystem.Models;
+using BusManagementSystem.Service;
 
-namespace BusManagementSystem.Controllers
+namespace BusManagementSystem.Controllers;
+
+[Authorize(Policy = "ManagerOnly")]
+public class StopController : Controller
 {
-    [Authorize(Policy = "ManagerOnly")]
-    public class StopController : Controller
+    private readonly IStopServiceInterface _stopServiceInterface;
+    private readonly ILogger<StopController> _logger;
+
+    public StopController(IStopServiceInterface stopServiceInterface, ILogger<StopController> logger)
     {
-        private readonly BusContext _context;
+        _stopServiceInterface = stopServiceInterface;
+        _logger = logger;
+    }
 
-        public StopController(BusContext context)
+    public async Task<IActionResult> Index()
+    {
+        var stops = _stopServiceInterface.GetStops();
+        return View(stops);
+    }
+
+    [HttpPost]
+    [ValidateAntiForgeryToken]
+    public async Task<IActionResult> Create([Bind("Id,Name,Latitude,Longitude")] Stop stop)
+    {
+        await _stopServiceInterface.AddStop(stop);
+        _logger.LogInformation("Added stop with id {id} at {time}", stop.Id, DateTime.Now);
+        return RedirectToAction("Index");
+    }
+
+    public async Task<IActionResult> Edit(int id)
+    {
+        var stop = await _stopServiceInterface.GetStop(id);
+        if (stop == null)
         {
-            _context = context;
+            return NotFound();
         }
 
-        public async Task<IActionResult> Index()
+        return View(stop);
+    }
+
+    [HttpPost]
+    [ValidateAntiForgeryToken]
+    public async Task<IActionResult> Edit(int id, [Bind("Id,Name,Latitude,Longitude")] Stop stop)
+    {
+        if (id != stop.Id)
         {
-            var stops = await _context.Stops.ToListAsync();
-            return View(stops);
+            return NotFound();
         }
 
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("StopId,Name,Latitude,Longitude")] Stop stop)
-        {
-            if (ModelState.IsValid)
-            {
-                _context.Stops.Add(stop);
-                await _context.SaveChangesAsync();
-                return RedirectToAction(nameof(Index));
-            }
 
+        try
+        {
+            await _stopServiceInterface.UpdateStop(stop);
+            _logger.LogInformation("Edited stop with id: {id} at {time}", stop.Id, DateTime.Now);
             return RedirectToAction("Index");
         }
-
-        public async Task<IActionResult> Edit(int id)
+        catch (Exception e)
         {
-            var stop = await _context.Stops.FindAsync(id);
+            _logger.LogError("Edit Failed with exception {exception} at {time}.", e.Message, DateTime.Now);
+            return NotFound();
+        }
+    }
+
+    [HttpPost]
+    [ValidateAntiForgeryToken]
+    public async Task<IActionResult> Delete(int stopId)
+    {
+        try
+        {
+            var stop = await _stopServiceInterface.GetStop(stopId);
             if (stop == null)
             {
+                _logger.LogWarning("Stop with id: {id} not found for deletion at {time}.", stopId, DateTime.Now);
                 return NotFound();
             }
 
-            return View(stop);
+            await _stopServiceInterface.DeleteStop(stopId);
+            _logger.LogInformation("Deleted stop with id: {id} at {time}", stopId, DateTime.Now);
         }
-
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int stopId, [Bind("StopId,Name,Latitude,Longitude")] Stop stop)
+        catch (Exception e)
         {
-            if (stopId != stop.StopId)
-            {
-                return NotFound();
-            }
-
-            if (ModelState.IsValid)
-            {
-                var foundStop = _context.Stops.FirstOrDefault(b => b.StopId == stopId);
-                if (foundStop != null)
-                {
-                    foundStop.Name = stop.Name;
-                    foundStop.Latitude = stop.Latitude;
-                    foundStop.Longitude = stop.Longitude;
-                    _context.SaveChanges();
-                }
-
-                return RedirectToAction("Index");
-            }
-            else
-            {
-                return View(stop);
-            }
+            _logger.LogError("Delete Stop failed with exception {exception} at {time}.", e.Message, DateTime.Now);
+            return NotFound();
         }
 
-        // public async Task<IActionResult> Delete(int id)
-        // {
-        //     var stop = await _context.Stops.FindAsync(id);
-        //     if (stop == null)
-        //     {
-        //         return NotFound();
-        //     }
-        //
-        //     return View(stop);
-        // }
-        //
-        // [HttpPost, ActionName("Delete")]
-        // [ValidateAntiForgeryToken]
-        // public async Task<IActionResult> DeleteConfirmed(int id)
-        // {
-        //     var stop = await _context.Stops.FindAsync(id);
-        //     _context.Stops.Remove(stop);
-        //     await _context.SaveChangesAsync();
-        //     return RedirectToAction(nameof(Index));
-        // }
+        return RedirectToAction(nameof(Index));
     }
 }

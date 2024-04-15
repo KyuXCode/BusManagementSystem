@@ -30,7 +30,6 @@ namespace BusManagementSystem.Migrations
                 columns: table => new
                 {
                     Id = table.Column<string>(type: "TEXT", nullable: false),
-                    DriverId = table.Column<int>(type: "INTEGER", nullable: false),
                     FirstName = table.Column<string>(type: "TEXT", nullable: false),
                     LastName = table.Column<string>(type: "TEXT", nullable: false),
                     Email = table.Column<string>(type: "TEXT", maxLength: 256, nullable: false),
@@ -59,41 +58,26 @@ namespace BusManagementSystem.Migrations
                 name: "Buses",
                 columns: table => new
                 {
-                    BusId = table.Column<int>(type: "INTEGER", nullable: false)
+                    Id = table.Column<int>(type: "INTEGER", nullable: false)
                         .Annotation("Sqlite:Autoincrement", true),
                     BusNumber = table.Column<int>(type: "INTEGER", nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Buses", x => x.BusId);
+                    table.PrimaryKey("PK_Buses", x => x.Id);
                 });
 
             migrationBuilder.CreateTable(
                 name: "Loops",
                 columns: table => new
                 {
-                    LoopId = table.Column<int>(type: "INTEGER", nullable: false)
+                    Id = table.Column<int>(type: "INTEGER", nullable: false)
                         .Annotation("Sqlite:Autoincrement", true),
                     Name = table.Column<string>(type: "TEXT", nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Loops", x => x.LoopId);
-                });
-
-            migrationBuilder.CreateTable(
-                name: "Stops",
-                columns: table => new
-                {
-                    StopId = table.Column<int>(type: "INTEGER", nullable: false)
-                        .Annotation("Sqlite:Autoincrement", true),
-                    Name = table.Column<string>(type: "TEXT", nullable: false),
-                    Latitude = table.Column<double>(type: "REAL", nullable: false),
-                    Longitude = table.Column<double>(type: "REAL", nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_Stops", x => x.StopId);
+                    table.PrimaryKey("PK_Loops", x => x.Id);
                 });
 
             migrationBuilder.CreateTable(
@@ -203,25 +187,53 @@ namespace BusManagementSystem.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "Stops",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "INTEGER", nullable: false)
+                        .Annotation("Sqlite:Autoincrement", true),
+                    Name = table.Column<string>(type: "TEXT", nullable: false),
+                    Latitude = table.Column<double>(type: "REAL", nullable: false),
+                    Longitude = table.Column<double>(type: "REAL", nullable: false),
+                    LoopId = table.Column<int>(type: "INTEGER", nullable: true),
+                    StopId = table.Column<int>(type: "INTEGER", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Stops", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_Stops_Loops_LoopId",
+                        column: x => x.LoopId,
+                        principalTable: "Loops",
+                        principalColumn: "Id");
+                    table.ForeignKey(
+                        name: "FK_Stops_Stops_StopId",
+                        column: x => x.StopId,
+                        principalTable: "Stops",
+                        principalColumn: "Id");
+                });
+
+            migrationBuilder.CreateTable(
                 name: "Entries",
                 columns: table => new
                 {
-                    EntryId = table.Column<int>(type: "INTEGER", nullable: false)
+                    Id = table.Column<int>(type: "INTEGER", nullable: false)
                         .Annotation("Sqlite:Autoincrement", true),
                     Timestamp = table.Column<DateTime>(type: "TEXT", nullable: false),
                     Boarded = table.Column<int>(type: "INTEGER", nullable: false),
                     LeftBehind = table.Column<int>(type: "INTEGER", nullable: false),
-                    DriverId = table.Column<string>(type: "TEXT", nullable: false),
+                    DriverId = table.Column<int>(type: "INTEGER", nullable: false),
                     BusId = table.Column<int>(type: "INTEGER", nullable: false),
                     LoopId = table.Column<int>(type: "INTEGER", nullable: false),
-                    StopId = table.Column<int>(type: "INTEGER", nullable: false)
+                    StopId = table.Column<int>(type: "INTEGER", nullable: false),
+                    DriverId1 = table.Column<string>(type: "TEXT", nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Entries", x => x.EntryId);
+                    table.PrimaryKey("PK_Entries", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_Entries_AspNetUsers_DriverId",
-                        column: x => x.DriverId,
+                        name: "FK_Entries_AspNetUsers_DriverId1",
+                        column: x => x.DriverId1,
                         principalTable: "AspNetUsers",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
@@ -229,19 +241,19 @@ namespace BusManagementSystem.Migrations
                         name: "FK_Entries_Buses_BusId",
                         column: x => x.BusId,
                         principalTable: "Buses",
-                        principalColumn: "BusId",
+                        principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
                         name: "FK_Entries_Loops_LoopId",
                         column: x => x.LoopId,
                         principalTable: "Loops",
-                        principalColumn: "LoopId",
+                        principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
                         name: "FK_Entries_Stops_StopId",
                         column: x => x.StopId,
                         principalTable: "Stops",
-                        principalColumn: "StopId",
+                        principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                 });
 
@@ -249,7 +261,7 @@ namespace BusManagementSystem.Migrations
                 name: "Routes",
                 columns: table => new
                 {
-                    RouteId = table.Column<int>(type: "INTEGER", nullable: false)
+                    Id = table.Column<int>(type: "INTEGER", nullable: false)
                         .Annotation("Sqlite:Autoincrement", true),
                     Order = table.Column<int>(type: "INTEGER", nullable: false),
                     StopId = table.Column<int>(type: "INTEGER", nullable: false),
@@ -257,18 +269,18 @@ namespace BusManagementSystem.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Routes", x => x.RouteId);
+                    table.PrimaryKey("PK_Routes", x => x.Id);
                     table.ForeignKey(
                         name: "FK_Routes_Loops_LoopId",
                         column: x => x.LoopId,
                         principalTable: "Loops",
-                        principalColumn: "LoopId",
+                        principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
                         name: "FK_Routes_Stops_StopId",
                         column: x => x.StopId,
                         principalTable: "Stops",
-                        principalColumn: "StopId",
+                        principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                 });
 
@@ -315,9 +327,9 @@ namespace BusManagementSystem.Migrations
                 column: "BusId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Entries_DriverId",
+                name: "IX_Entries_DriverId1",
                 table: "Entries",
-                column: "DriverId");
+                column: "DriverId1");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Entries_LoopId",
@@ -337,6 +349,16 @@ namespace BusManagementSystem.Migrations
             migrationBuilder.CreateIndex(
                 name: "IX_Routes_StopId",
                 table: "Routes",
+                column: "StopId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Stops_LoopId",
+                table: "Stops",
+                column: "LoopId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Stops_StopId",
+                table: "Stops",
                 column: "StopId");
         }
 
@@ -374,10 +396,10 @@ namespace BusManagementSystem.Migrations
                 name: "Buses");
 
             migrationBuilder.DropTable(
-                name: "Loops");
+                name: "Stops");
 
             migrationBuilder.DropTable(
-                name: "Stops");
+                name: "Loops");
         }
     }
 }

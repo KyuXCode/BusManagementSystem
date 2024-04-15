@@ -1,0 +1,64 @@
+@using BusManagementSystem.Service
+@inject IRouteServiceInterface _routeServiceInterface
+@inject ILoopServiceInterface _loopServiceInterface
+@model BusManagementSystem.Models.Route
+
+@{
+    ViewData["Title"] = "Create New Route";
+    var loopIdString = ViewContext.RouteData.Values["loopId"] as string;
+    var loopId = Convert.ToInt32(loopIdString);
+    // var loop = await _loopServiceInterface.GetLoop(loopId);
+}
+
+<h2>Create New Route @loopId</h2>
+<a href="/Route/loop/@loopId">Back to List</a>
+<div class="row">
+    <div class="col-md-4">
+        <form asp-action="Create">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            <input type="hidden" asp-for="Id"/>
+            <div class="form-group">
+                <label asp-for="Loop" class="control-label"></label>
+                <select id="loopSelect" asp-for="LoopId" class="form-control">
+                    <option value="">Select Loop</option>
+                    @foreach (var loop in (ViewBag.Loops as List<Loop>)!)
+                    {
+                        <option value="@loop.Id">@loop.Name</option>
+                    }
+                </select>
+                <span asp-validation-for="Loop" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Stop" class="control-label"></label>
+                <select asp-for="StopId" class="form-control">
+                    <option value="">Select Stop</option>
+                    @foreach (var stop in (ViewBag.Stops as List<Stop>)!)
+                    {
+                        <option value="@stop.Id">@stop.Name</option>
+                    }
+                </select>
+                <span asp-validation-for="Stop" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Order" class="control-label"></label>
+                @{
+                    var routes = _routeServiceInterface.GetRoutesWithLoopId(loopId);
+
+                    var routesCount = routes?.Count ?? 0;
+                    var order = routesCount + 1;
+                }
+                <input id="orderInput" type="number" asp-for="Order" class="form-control" value="@order" readonly/>
+                <span asp-validation-for="Order" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <input type="submit" value="Save" class="btn btn-primary"/>
+            </div>
+        </form>
+    </div>
+</div>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}

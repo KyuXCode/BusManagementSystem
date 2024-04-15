@@ -1,0 +1,10 @@
+<div class="row justify-content-center">
+    @foreach (var loop in Model)
+    {
+        <div class="col-md-3 mb-3">
+            <a href="@Url.Action("Index", "Route", new { loopId = loop.Id })" class="btn btn-primary w-100" style="background-color: @loop.Name">
+                @loop.Name
+            </a>
+        </div>
+    }
+</div>

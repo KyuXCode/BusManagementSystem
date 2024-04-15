@@ -2,7 +2,9 @@ namespace BusManagementSystem.Models;
 
 public class Loop
 {
-    public int LoopId { get; set; }
+    public int Id { get; set; }
     public string Name { get; set; }
-    public List<Route> Routes { get; set; } = new List<Route>();
-}   
+    public ICollection<Route> Routes { get; set; }
+    public ICollection<Entry> Entries { get; }
+    public ICollection<Stop> Stops { get; }
+}

@@ -13,37 +13,54 @@
         </div>
     </div>
     <hr id="separator">
-    <table id="stop-table" class="table table-striped">
-        <thead>
-        <tr>
-            <th>Stop Name</th>
-            <th>Latitude</th>
-            <th>Longitude</th>
-            <th>Actions</th>
-        </tr>
-        </thead>
-        <tbody>
-        @foreach (var stop in Model)
-        {
+    <form id="deleteForm" asp-action="Delete" method="post">
+        <table id="stop-table" class="table table-striped">
+            <thead>
             <tr>
-                <td>@stop.Name</td>
-                <td>@stop.Latitude</td>
-                <td>@stop.Longitude</td>
-                <td>
-                    <a class="btn btn-primary" asp-action="Edit" asp-route-id="@stop.StopId">Edit</a> |
-                    <a class="btn btn-danger" asp-action="Edit" asp-route-id="@stop.StopId">Delete</a>
-                </td>
+                <th>Stop Name</th>
+                <th>Latitude</th>
+                <th>Longitude</th>
+                <th>Actions</th>
             </tr>
-        }
-        </tbody>
-    </table>
+            </thead>
+            <tbody>
+            @foreach (var stop in Model)
+            {
+                <tr>
+                    <td>@stop.Name</td>
+                    <td>@stop.Latitude</td>
+                    <td>@stop.Longitude</td>
+                    <td>
+                        <a class="btn btn-primary" asp-action="Edit" asp-route-id="@stop.Id">Edit</a> |
+                        <asp:Button UseSubmitBehavior="false" class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#deleteStopModal_@stop.Id" runat="server">Delete</asp:Button>
+                    </td>
+                </tr>
+                <div class="modal fade" id="deleteStopModal_@stop.Id" tabindex="-1" aria-labelledby="deleteStopModalLabel" aria-hidden="true">
+                    <div class="modal-dialog modal-dialog-centered">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h5 class="modal-title fs-5" id="deleteStopModalLabel">Delete Stop</h5>
+                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close">
+                                </button>
+                            </div>
+                            <div class="modal-body">
+                                Permanently delete @stop.Name from the database?
+                            </div>
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                                <button type="submit" class="btn btn-danger" asp-action="Delete" asp-route-stopId="@stop.Id">Confirm</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            }
+            </tbody>
+        </table>
+    </form>
 </div>
 
 <!-- Create Stop Modal -->
 @await Html.PartialAsync("_CreateStopModal", new BusManagementSystem.Models.Stop())
-
-<!-- Delete Stop Modal -->
-@* @await Html.PartialAsync("_DeleteStopModal") *@
 
 @section Scripts {
     @{ await Html.RenderPartialAsync("_ValidationScriptsPartial"); }
