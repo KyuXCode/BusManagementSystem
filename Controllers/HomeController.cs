@@ -34,7 +34,7 @@ public class HomeController : Controller
     {
         var drivers = _driverServiceInterface.GetDrivers();
 
-        var activeUsers = await _userManager.GetUsersForClaimAsync(new Claim("IsActive", "1", ClaimValueTypes.Integer));
+        var activeUsers = await _userManager.GetUsersForClaimAsync(new Claim("IsActive", "true"));
         var activeUserIds = activeUsers.Select(u => u.Id).ToList(); // Fetch and store IDs
         
         drivers = drivers.Where(d => !d.IsManager && !activeUserIds.Contains(d.Id)).ToList();

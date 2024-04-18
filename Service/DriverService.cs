@@ -39,6 +39,8 @@ public class DriverService : IDriverServiceInterface
 
         foundDriver.FirstName = driver.FirstName;
         foundDriver.LastName = driver.LastName;
+        foundDriver.IsActive = driver.IsActive;
+        
 
         // Mark the found driver as modified
         _context.Entry(foundDriver).State = EntityState.Modified;

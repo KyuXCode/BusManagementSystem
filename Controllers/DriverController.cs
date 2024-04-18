@@ -88,29 +88,23 @@ public class DriverController : Controller
         }
 
         // Add the approval claim to the user
-        var result = await _userManager.AddClaimAsync(user, new Claim("IsActive", "1"));
-        _logger.LogInformation("User with id {userId} approved at {time}.", userId, DateTime.Now);
+        var claim = new Claim("IsActive", "true");
+        var result = await _userManager.AddClaimAsync(user, claim);
 
         if (!result.Succeeded)
         {
             // Handle the case where the claim couldn't be added
+            _logger.LogError("Failed to add IsActive claim to user.");
             return BadRequest();
         }
 
         // If the claim was added successfully, update the user
+        user.IsActive = true;
         await _userManager.UpdateAsync(user);
-        var identity = _httpContextAccessor.HttpContext.User.Identity as ClaimsIdentity;
+        
+        _logger.LogInformation("User with id {userId} approved at {time}.", userId, DateTime.Now);
 
-        if (identity != null)
-        {
-            identity.AddClaim(new Claim("IsActive", "true"));
-            // Redirect to the Driver Index action method
-            return RedirectToAction("Dashboard", "Home");
-        }
-
-        // Sign out the user
-        await _signInManager.SignOutAsync();
-        // Redirect to the Login page
-        return RedirectToAction("Login", "User");
+        // Redirect to the Dashboard page
+        return RedirectToAction("Dashboard", "Home");
     }
 }
