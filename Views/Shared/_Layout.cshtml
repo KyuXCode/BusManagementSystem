@@ -57,11 +57,11 @@
                                     <a class="nav-link text-dark" asp-controller="Loop" asp-action="Index">Loop</a>
                                 </li>
                             }
-                        }
 
-                        <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="Driver" asp-action="SelectBusLoop">Select Bus</a>
-                        </li>
+                            <li class="nav-item">
+                                <a class="nav-link text-dark" asp-area="" asp-controller="Driver" asp-action="SelectBusLoop">Select Bus</a>
+                            </li>
+                        }
                     </ul>
 
                     @if (SignInManager.IsSignedIn(User))
@@ -102,7 +102,6 @@
 
 <footer class="border-top footer text-muted">
     <div class="container">
-        <a href="https://media.discordapp.net/attachments/1042633236372795408/1077646025914863707/ezgif.com-resize.gif">&copy; 2024 - BSU</a>
     </div>
 </footer>
 <script src="~/lib/jquery/dist/jquery.min.js"></script>

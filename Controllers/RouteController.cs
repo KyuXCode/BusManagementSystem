@@ -32,7 +32,9 @@ public class RouteController : Controller
         return View(loops);
     }
 
-    public IActionResult Create()
+    [HttpGet]
+    [Route("Route/loop/{loopId}/Create")]
+    public IActionResult Create(int loopId)
     {
         ViewBag.Loops = _routeServiceInterface.GetLoops();
         ViewBag.Stops = _routeServiceInterface.GetStops();
@@ -56,8 +58,10 @@ public class RouteController : Controller
     //         throw;
     //     }
     // }
-    
-    [HttpPost("Route/loop/{loopId}/Create/")]
+
+
+    [HttpPost] 
+    [Route("Route/loop/{loopId}/Create")]
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> Create([Bind("Id, Order, StopId, LoopId")] Route route, int loopId)
     {

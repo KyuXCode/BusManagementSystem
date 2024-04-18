@@ -15,8 +15,9 @@
 <div>
     <div id="route-index-header">
         <h1>@loop.Name Loop</h1>
-        <a class="btn btn-primary" asp-action="Create">Create New Route</a>
+        <a class="btn btn-primary" href="@Url.Action("Create", "Route", new { loopId = loop.Id })">Create New Route</a>
     </div>
+    <a href="/Route/SelectLoop">Back to List</a>
     <hr id="separator">
     <form id="deleteForm" asp-action="Delete" method="post">
         <table id="bus-table" class="table table-striped">
@@ -38,11 +39,28 @@
                     <td>@route.Order</td>
                     <td>
                         <a class="btn btn-primary" asp-action="Edit" asp-route-id="@route.Id">Edit</a> |
-                        <button class="btn btn-danger" asp-action="Delete" asp-route-busId="@route.Id">
-                            Delete
-                        </button>
+                        <asp:Button UseSubmitBehavior="false" class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#deleteRouteModal_@route.Id" runat="server">Delete</asp:Button>
                     </td>
                 </tr>
+
+                <div class="modal fade" id="deleteRouteModal_@route.Id" tabindex="-1" aria-labelledby="deleteRouteModalLabel" aria-hidden="true">
+                    <div class="modal-dialog modal-dialog-centered">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h5 class="modal-title fs-5" id="deleteStopModalLabel">Delete Stop</h5>
+                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close">
+                                </button>
+                            </div>
+                            <div class="modal-body">
+                                Remove @route.Stop.Name from @route.Loop.Name Loop from the database?
+                            </div>
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                                <button type="submit" class="btn btn-danger" asp-action="Delete" asp-route-routeId="@route.Id">Confirm</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
             }
             </tbody>
         </table>

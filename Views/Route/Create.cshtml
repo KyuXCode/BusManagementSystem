@@ -7,10 +7,10 @@
     ViewData["Title"] = "Create New Route";
     var loopIdString = ViewContext.RouteData.Values["loopId"] as string;
     var loopId = Convert.ToInt32(loopIdString);
-    // var loop = await _loopServiceInterface.GetLoop(loopId);
+    var loop = await _loopServiceInterface.GetLoop(loopId);
 }
 
-<h2>Create New Route @loopId</h2>
+<h2>Create New Route for @loop.Name Loop</h2>
 <a href="/Route/loop/@loopId">Back to List</a>
 <div class="row">
     <div class="col-md-4">
@@ -19,13 +19,10 @@
             <input type="hidden" asp-for="Id"/>
             <div class="form-group">
                 <label asp-for="Loop" class="control-label"></label>
-                <select id="loopSelect" asp-for="LoopId" class="form-control">
-                    <option value="">Select Loop</option>
-                    @foreach (var loop in (ViewBag.Loops as List<Loop>)!)
-                    {
+                <select id="loopSelect" asp-for="LoopId" class="form-control" readonly>
                         <option value="@loop.Id">@loop.Name</option>
-                    }
                 </select>
+
                 <span asp-validation-for="Loop" class="text-danger"></span>
             </div>
             <div class="form-group">
