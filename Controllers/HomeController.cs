@@ -34,17 +34,14 @@ public class HomeController : Controller
     {
         var drivers = _driverServiceInterface.GetDrivers();
 
-        var activeUserIds = (await _userManager.GetUsersForClaimAsync(new Claim("IsActive", "true"))).Select(u => u.Id);
-
+        var activeUsers = await _userManager.GetUsersForClaimAsync(new Claim("IsActive", "1", ClaimValueTypes.Integer));
+        var activeUserIds = activeUsers.Select(u => u.Id).ToList(); // Fetch and store IDs
+        
         drivers = drivers.Where(d => !d.IsManager && !activeUserIds.Contains(d.Id)).ToList();
 
-        var viewModel = new DashboardViewModel
-        {
-            Drivers = drivers
-        };
-
-        return View(viewModel);
+        return View(drivers);
     }
+
 
     [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
     public IActionResult Error()

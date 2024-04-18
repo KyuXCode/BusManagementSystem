@@ -19,7 +19,7 @@
         <form id="entry-creator-form" asp-controller="Entry" asp-action="Create" method="post">
             <div id="form-section">
                 <label class="form-label" for="StopId">Stop:</label>
-                <select id="stop-id" asp-for="SelectedStopId" asp-items="@(new SelectList(Model.Loop.Routes.OrderBy(r => r.Order).Select(r => r.Stop), "Id", "Name"))"></select>
+                @* <select id="stop-id" asp-for="SelectedStopId" asp-items="@(new SelectList(Model.Loop.Routes.OrderBy(r => r.Order).Select(r => r.Stop), "Id", "Name"))"></select> *@
             </div>
             <div id="form-section">
                 <label class="form-label" for="Entry.Boarded">Passengers boarded:</label>

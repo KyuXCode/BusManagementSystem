@@ -22,7 +22,7 @@ public class DriverService : IDriverServiceInterface
         return await _context.Drivers.FindAsync(id);
     }
 
-    public async Task<int> AddDriver(Driver driver)
+    public async Task<string> AddDriver(Driver driver)
     {
         _context.Drivers.Add(driver);
         await _context.SaveChangesAsync();

@@ -88,7 +88,7 @@ public class DriverController : Controller
         }
 
         // Add the approval claim to the user
-        var result = await _userManager.AddClaimAsync(user, new Claim("IsActive", "true"));
+        var result = await _userManager.AddClaimAsync(user, new Claim("IsActive", "1"));
         _logger.LogInformation("User with id {userId} approved at {time}.", userId, DateTime.Now);
 
         if (!result.Succeeded)

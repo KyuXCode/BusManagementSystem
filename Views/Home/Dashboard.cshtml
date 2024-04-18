@@ -1,4 +1,6 @@
-@model BusManagementSystem.ViewModels.DashboardViewModel;
+@using BusManagementSystem.Service
+@model IEnumerable<BusManagementSystem.Models.Driver>
+
 
 @{
     ViewData["Title"] = "Driver Dashboard";
@@ -17,13 +19,13 @@
         </tr>
         </thead>
         <tbody>
-        @foreach (var driver in Model.Drivers)
+        @foreach (var driver in Model)
         {
             <tr>
                 <td id="@driver.Id">@driver.FirstName @driver.LastName</td>
                 <td>
                     <form asp-controller="Driver" asp-action="ApproveDriver" method="post">
-                        <input type="hidden" name="userId" value="@driver.Id" />
+                        <input type="hidden" name="userId" value="@driver.Id.ToString()"/>
                         <button type="submit" class="btn btn-secondary">Approve</button>
                     </form>
                 </td>
