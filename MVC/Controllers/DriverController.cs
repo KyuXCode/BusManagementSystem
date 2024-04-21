@@ -78,33 +78,27 @@ public class DriverController : Controller
     public async Task<IActionResult> ApproveDriver(string userId)
     {
         _logger.LogInformation("Approve Driver called for user {id} at {time}.", userId, DateTime.Now);
-        // Check if user exists
         var user = await _userManager.FindByIdAsync(userId);
         if (user == null)
         {
-            // Handle the case where the user doesn't exist
             _logger.LogWarning("Approve Driver called on user that does not exist.", DateTime.Now);
             return NotFound();
         }
 
-        // Add the approval claim to the user
         var claim = new Claim("IsActive", "true");
         var result = await _userManager.AddClaimAsync(user, claim);
 
         if (!result.Succeeded)
         {
-            // Handle the case where the claim couldn't be added
             _logger.LogError("Failed to add IsActive claim to user.");
             return BadRequest();
         }
 
-        // If the claim was added successfully, update the user
         user.IsActive = true;
         await _userManager.UpdateAsync(user);
         
         _logger.LogInformation("User with id {userId} approved at {time}.", userId, DateTime.Now);
 
-        // Redirect to the Dashboard page
         return RedirectToAction("Dashboard", "Home");
     }
 }

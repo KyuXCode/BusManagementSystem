@@ -83,4 +83,17 @@ public class EntryService : IEntryServiceInterface
         await _context.SaveChangesAsync();
         return selectedEntry;
     }
+    
+    public async Task<List<Entry>> DeleteEntries(List<int> ids)
+    {
+        var entriesToDelete = await _context.Entries.Where(e => ids.Contains(e.Id)).ToListAsync();
+        if (entriesToDelete.Count == 0)
+        {
+            throw new Exception("Entries not found");
+        }
+
+        _context.Entries.RemoveRange(entriesToDelete);
+        await _context.SaveChangesAsync();
+        return entriesToDelete;
+    }
 }

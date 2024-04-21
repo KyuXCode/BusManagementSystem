@@ -2,88 +2,91 @@
 
 @{
     ViewData["Title"] = "Entries";
-    <link rel="stylesheet" href="~/css/entry_index.css" />
+    <link rel="stylesheet" href="~/css/entry_index.css"/>
 }
 
 <div>
-    <div id="entry-index-header">
-        <h1>Entries</h1>
-        <button type="button" class="btn btn-primary" id="exportButton">Export Current Entries</button>
-    </div>
-    <hr id="separator">
-    <div id="filters">
-        <div class="filter">
-            <button type="button" class="btn btn-secondary" id="toggleFilterPanelButton">Show Filters</button>
+    <form id="deleteEntries" asp-action="DeleteConfirmed" asp-controller="Entry" method="post">
+        <div id="entry-index-header">
+            <h1>Entries</h1>
+            <button type="button" class="btn btn-primary" id="exportButton">Export Current Entries</button>
         </div>
-        <div class="filter">
-            <label for="sortBy">Sort by:</label>
-            <select id="sortBy">
-                <option value="">Select Sort Option...</option>
-                <option value="bus">Bus</option>
-                <option value="driver">Driver</option>
-                <option value="loop">Loop</option>
-                <option value="stop">Stop</option>
-                <option value="timestamp">Timestamp</option>
-            </select>
+        <hr id="separator">
+        <div id="filters">
+            <div class="filter">
+                <button type="button" class="btn btn-secondary" id="toggleFilterPanelButton">Show Filters</button>
+            </div>
+            <div class="filter">
+                <label for="sortBy">Sort by:</label>
+                <select id="sortBy">
+                    <option value="">Select Sort Option...</option>
+                    <option value="bus">Bus</option>
+                    <option value="driver">Driver</option>
+                    <option value="loop">Loop</option>
+                    <option value="stop">Stop</option>
+                    <option value="timestamp">Timestamp</option>
+                </select>
+            </div>
+            <div class="filter">
+                <label for="sortBy">Order:</label>
+                <select id="sortOrder">
+                    <option value="">Select Sort Order...</option>
+                    <option value="ascending">Ascending</option>
+                    <option value="descending">Descending</option>
+                </select>
+            </div>
+
+            <button type="submit" class="btn btn-danger" id="batchDeleteButton">Delete Selected</button>
+
+            <div id="filterPanelContainer" style="display: none;">
+                <div class="filter-section">
+                    <h5>Bus:</h5>
+                    @foreach (var bus in Model.Select(e => e.Bus.BusNumber).Distinct())
+                    {
+                        <div class="filter-option">
+                            <input type="checkbox" name="busFilter" value="@bus"/>
+                            <label>#@bus</label>
+                        </div>
+                    }
+                </div>
+                <div class="filter-section">
+                    <h5>Driver:</h5>
+                    @foreach (var driver in Model.Select(e => new { e.Driver.FirstName, e.Driver.LastName }).Distinct())
+                    {
+                        <div class="filter-option">
+                            <input type="checkbox" name="driverFilter" value="@driver.FirstName @driver.LastName"/>
+                            <label>@driver.FirstName @driver.LastName</label>
+                        </div>
+                    }
+                </div>
+                <div class="filter-section">
+                    <h5>Loop:</h5>
+                    @foreach (var loop in Model.Select(e => e.Loop.Name).Distinct())
+                    {
+                        <div class="filter-option">
+                            <input type="checkbox" name="loopFilter" value="@loop"/>
+                            <label>@loop</label>
+                        </div>
+                    }
+                </div>
+                <div class="filter-section">
+                    <h5>Stop:</h5>
+                    @foreach (var stop in Model.Select(e => e.Stop.Name).Distinct())
+                    {
+                        <div class="filter-option">
+                            <input type="checkbox" name="stopFilter" value="@stop"/>
+                            <label>@stop</label>
+                        </div>
+                    }
+                </div>
+                <div class="filter-section">
+                    <h5>Timestamp:</h5>
+                    <input type="date" id="dateFilter" onchange="applyFilterAndSort()">
+                </div>
+            </div>
         </div>
-        <div class="filter">
-            <label for="sortBy">Order:</label>
-            <select id="sortOrder">
-                <option value="">Select Sort Order...</option>
-                <option value="ascending">Ascending</option>
-                <option value="descending">Descending</option>
-            </select>
-        </div>
-        <button type="button" class="btn btn-danger" id="batchDeleteButton" onclick="showDeleteEntryModal()">Delete Selected</button>
-        <div id="filterPanelContainer" style="display: none;">
-            <div class="filter-section">
-                <h5>Bus:</h5>
-                @foreach (var bus in Model.Select(e => e.Bus.BusNumber).Distinct())
-                {
-                    <div class="filter-option">
-                        <input type="checkbox" name="busFilter" value="@bus" />
-                        <label>#@bus</label>
-                    </div>
-                }
-            </div>
-            <div class="filter-section">
-                <h5>Driver:</h5>
-                @foreach (var driver in Model.Select(e => new { e.Driver.FirstName, e.Driver.LastName }).Distinct())
-                {
-                    <div class="filter-option">
-                        <input type="checkbox" name="driverFilter" value="@driver.FirstName @driver.LastName" />
-                        <label>@driver.FirstName @driver.LastName</label>
-                    </div>
-                }
-            </div>
-            <div class="filter-section">
-                <h5>Loop:</h5>
-                @foreach (var loop in Model.Select(e => e.Loop.Name).Distinct())
-                {
-                    <div class="filter-option">
-                        <input type="checkbox" name="loopFilter" value="@loop" />
-                        <label>@loop</label>
-                    </div>
-                }
-            </div>
-            <div class="filter-section">
-                <h5>Stop:</h5>
-                @foreach (var stop in Model.Select(e => e.Stop.Name).Distinct())
-                {
-                    <div class="filter-option">
-                        <input type="checkbox" name="stopFilter" value="@stop" />
-                        <label>@stop</label>
-                    </div>
-                }
-            </div>
-            <div class="filter-section">
-                <h5>Timestamp:</h5>
-                <input type="date" id="dateFilter" onchange="applyFilterAndSort()">
-            </div>
-        </div>
-    </div>
-    <table id="entry-table" class="table table-striped">
-        <thead>
+        <table id="entry-table" class="table table-striped">
+            <thead>
             <tr>
                 <th>
                     <input type="checkbox" id="selectAllCheckbox">
@@ -96,8 +99,8 @@
                 <th>Left Behind</th>
                 <th>Timestamp</th>
             </tr>
-        </thead>
-        <tbody>
+            </thead>
+            <tbody>
             @foreach (var entry in Model)
             {
                 <tr data-bus="@entry.Bus.BusNumber" data-driver="@entry.Driver.FirstName @entry.Driver.LastName" data-loop="@entry.Loop.Name" data-stop="@entry.Stop.Name" data-timestamp="@entry.Timestamp">
@@ -113,13 +116,14 @@
                     <td data-attribute="timestamp">@entry.Timestamp</td>
                 </tr>
             }
-        </tbody>
-    </table>
+            </tbody>
+        </table>
+    </form>
 </div>
 
 
 @section Scripts {
-    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+    @{ await Html.RenderPartialAsync("_ValidationScriptsPartial"); }
     <script src="~/js/entry_actions.js"></script>
 
     <script>
@@ -208,6 +212,17 @@
         document.getElementById("exportButton").addEventListener("click", () => {
             const csvContent = tableToCSV();
             downloadCSV(csvContent, "entries.csv");
+        });
+        
+        
+        document.getElementById("deleteEntries").addEventListener("submit", function(event) {
+            const selectedEntryCheckboxes = document.querySelectorAll('input[type="checkbox"][name="entryCheckbox"]:checked');
+            const selectedEntryIds = Array.from(selectedEntryCheckboxes).map(checkbox => checkbox.getAttribute("data-entry-id"));
+        
+            const formAction = '@Url.Action("DeleteConfirmed", "Entry")' + '?ids=' + selectedEntryIds.join(",");
+            document.getElementById("deleteEntries").setAttribute("action", formAction);
+        
+            return true; // Allow form submission to proceed
         });
     </script>
 }

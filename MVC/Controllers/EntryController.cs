@@ -98,22 +98,39 @@ namespace BusManagementSystem.Controllers
 
             return RedirectToAction(nameof(Index));
         }
-
-        [HttpPost, ActionName("Delete")]
-        public async Task<IActionResult> DeleteConfirmed(int id)
+        
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> DeleteConfirmed()
         {
+            // Retrieve the "ids" parameter from the query string
+            var idsString = Request.Query["ids"];
+
+            // Check if the "ids" parameter is provided
+            if (string.IsNullOrEmpty(idsString))
+            {
+                // No IDs provided, return an error response or handle the situation accordingly
+                return BadRequest("No IDs provided for deletion.");
+            }
+
+            // Split the string of IDs by comma and convert them into integers
+            var ids = idsString
+                .ToString()
+                .Split(',', StringSplitOptions.RemoveEmptyEntries)
+                .Select(id => int.Parse(id.Trim()))
+                .ToList();
+
             try
             {
-                await _entryServiceInterface.DeleteEntry(id);
-                _logger.LogInformation("Deleted entries with id {id} at {time}", id, DateTime.Now);
+                await _entryServiceInterface.DeleteEntries(ids);
+                _logger.LogInformation("Deleted entries with IDs {ids} at {time}", string.Join(",", ids), DateTime.Now);
+                return RedirectToAction("Index");
             }
             catch (Exception e)
             {
-                _logger.LogWarning("Delete Bus Failed with exception {exception} at {time}.", e.Message, DateTime.Now);
+                _logger.LogWarning("Delete entries failed with exception {exception} at {time}.", e.Message, DateTime.Now);
                 return NotFound();
             }
-
-            return RedirectToAction(nameof(Index));
         }
     }
 }

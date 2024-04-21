@@ -11,4 +11,5 @@ public interface IEntryServiceInterface
     Task<int> AddEntry(Entry entry);
     Task<Entry> UpdateEntry(Entry entry);
     Task<Entry> DeleteEntry(int id);
+    Task<List<Entry>> DeleteEntries(List<int> ids);
 }
