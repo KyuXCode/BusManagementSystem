@@ -10,4 +10,5 @@ public class EntryCreatorViewModel
     public int SelectedStopId { get; set; }
     public int BusId { get; set; }
     public int LoopId { get; set; }
+    public string DriverId { get; set; }
 }

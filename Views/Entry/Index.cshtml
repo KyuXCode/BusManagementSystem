@@ -76,6 +76,10 @@
                     </div>
                 }
             </div>
+            <div class="filter-section">
+                <h5>Timestamp:</h5>
+                <input type="date" id="dateFilter" onchange="applyFilterAndSort()">
+            </div>
         </div>
     </div>
     <table id="entry-table" class="table table-striped">
@@ -96,7 +100,7 @@
         <tbody>
             @foreach (var entry in Model)
             {
-                <tr>
+                <tr data-bus="@entry.Bus.BusNumber" data-driver="@entry.Driver.FirstName @entry.Driver.LastName" data-loop="@entry.Loop.Name" data-stop="@entry.Stop.Name" data-timestamp="@entry.Timestamp">
                     <td>
                         <input type="checkbox" name="entryCheckbox" data-entry-id="@entry.Id">
                     </td>
@@ -119,6 +123,32 @@
     <script src="~/js/entry_actions.js"></script>
 
     <script>
+        function tableToCSV() {
+            const visibleRows = Array.from(document.querySelectorAll("#entry-table tbody tr:not([style='display: none;'])"));
+            const headers = Array.from(document.querySelectorAll("#entry-table th")).map(th => th.textContent);
+            const data = visibleRows.map(row => Array.from(row.children).map(cell => cell.textContent));
+        
+            const csvContent = [headers.join(",")];
+            data.forEach(row => {
+                csvContent.push(row.join(","));
+            });
+        
+            return csvContent.join("\n");
+        }
+
+
+        function downloadCSV(content, filename) {
+            const blob = new Blob([content], { type: "text/csv" });
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement("a");
+            a.href = url;
+            a.download = filename;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            window.URL.revokeObjectURL(url);
+        }
+
         function toggleFilterPanel() {
             const filterPanelContainer = document.getElementById("filterPanelContainer");
             const toggleFilterPanelButton = document.getElementById("toggleFilterPanelButton");
@@ -131,23 +161,53 @@
                 toggleFilterPanelButton.textContent = "Show Filters";
             }
         }
-    </script>
-
-    <script>
-        document.getElementById("toggleFilterPanelButton").addEventListener("click", toggleFilterPanel);
         
+        function applyFilterAndSort() {
+            const selectedBusFilters = Array.from(document.querySelectorAll('input[name="busFilter"]:checked')).map(checkbox => checkbox.value);
+            const selectedDriverFilters = Array.from(document.querySelectorAll('input[name="driverFilter"]:checked')).map(checkbox => checkbox.value);
+            const selectedLoopFilters = Array.from(document.querySelectorAll('input[name="loopFilter"]:checked')).map(checkbox => checkbox.value);
+            const selectedStopFilters = Array.from(document.querySelectorAll('input[name="stopFilter"]:checked')).map(checkbox => checkbox.value);
+            const selectedDate = document.getElementById("dateFilter").value;
+            const sortBy = document.getElementById("sortBy").value;
+            const sortOrder = document.getElementById("sortOrder").value;
+
+            const rows = Array.from(document.querySelectorAll("#entry-table tbody tr"));
+            rows.forEach(row => {
+                const bus = row.getAttribute("data-bus");
+                const driver = row.getAttribute("data-driver");
+                const loop = row.getAttribute("data-loop");
+                const stop = row.getAttribute("data-stop");
+               const timestamp = new Date(row.getAttribute("data-timestamp"));
+               const utcTimestamp = new Date(Date.UTC(timestamp.getFullYear(), timestamp.getMonth(), timestamp.getDate(), timestamp.getHours(), timestamp.getMinutes(), timestamp.getSeconds()));
+               const isoDate = utcTimestamp.toISOString().split('T')[0];             
+
+                console.log(new Date(row.getAttribute("data-timestamp")));
+                
+            const isVisible = 
+                (selectedBusFilters.length === 0 || selectedBusFilters.includes(bus)) && 
+                (selectedDriverFilters.length === 0 || selectedDriverFilters.includes(driver)) &&
+                (selectedLoopFilters.length === 0 || selectedLoopFilters.includes(loop)) &&
+                (selectedStopFilters.length === 0 || selectedStopFilters.includes(stop)) &&
+                (!selectedDate || isoDate === selectedDate);
+                console.log("Selected: " + selectedDate);
+                console.log("timestamp: " + isoDate);
+
+            row.style.display = isVisible ? "" : "none";
+         });
+        }
+        
+        document.getElementById("toggleFilterPanelButton").addEventListener("click", toggleFilterPanel);
         document.getElementById("sortBy").addEventListener("change", applyFilterAndSort);
         document.getElementById("sortOrder").addEventListener("change", applyFilterAndSort);
 
         const filterCheckboxes = document.querySelectorAll('input[type="checkbox"][name$="Filter"]');
-
         filterCheckboxes.forEach(checkbox => {
             checkbox.addEventListener("change", applyFilterAndSort);
         });
 
         document.getElementById("exportButton").addEventListener("click", () => {
             const csvContent = tableToCSV();
-            downloadCSV(csvContent, "report.csv");
+            downloadCSV(csvContent, "entries.csv");
         });
     </script>
 }

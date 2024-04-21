@@ -1,9 +1,13 @@
 @using System.Text.Json
+@using BusManagementSystem.Service
+@inject IRouteServiceInterface _routeServiceInterface
+@inject IStopServiceInterface _stopServiceInterface
 @model BusManagementSystem.ViewModels.EntryCreatorViewModel
 
 @{
     ViewData["Title"] = "Trip Log";
     <link rel="stylesheet" href="~/css/entry_creator.css"/>
+    var routes = _routeServiceInterface.GetRoutesWithLoopId(Model.Loop.Id);
 }
 
 <div id="entry-creator-container">
@@ -19,26 +23,31 @@
         <form id="entry-creator-form" asp-controller="Entry" asp-action="Create" method="post">
             <div id="form-section">
                 <label class="form-label" for="SelectedStopId">Stop:</label>
-                <select id="selected-stop-id" asp-for="SelectedStopId" asp-items="@(new SelectList(Model.Loop.Routes.OrderBy(r => r.Order).Select(r => r.Stop), "Id", "Name"))">
-                    <option value="">Select Stop</option>
+                <select id="selected-stop-id" asp-for="SelectedStopId">
+                    @foreach (var route in routes)
+                    {
+                        var stop = await _stopServiceInterface.GetStop(route.StopId);
+                        <option value=@route.StopId>@stop.Name</option>
+                    }
                 </select>
             </div>
             <div id="form-section">
-                <label class="form-label" for="Entry.Boarded">Passengers boarded:</label>
+                <label class="form-label" asp-for="Entry.Boarded">Passengers boarded:</label>
                 <input type="text" placeholder="Enter..." asp-for="Entry.Boarded" class="form-control"/>
             </div>
             <div id="form-section">
-                <label class="form-label" for="Entry.LeftBehind">Passengers left behind:</label>
+                <label class="form-label" asp-for="Entry.LeftBehind">Passengers left behind:</label>
                 <input type="text" placeholder="Enter..." asp-for="Entry.LeftBehind" class="form-control"/>
             </div>
             <input type="hidden" asp-for="BusId"/>
+            <input type="hidden" asp-for="DriverId">
             <input type="hidden" asp-for="LoopId"/>
-            <input type="hidden" asp-for="Entry.Bus.Id" value="@Model.Bus.Id"/>
-            <input type="hidden" asp-for="Entry.Loop.Id" value="@Model.Loop.Id"/>
+            <input type="hidden" asp-for="Entry.Bus.Id" value="@Model.BusId"/>
+            <input type="hidden" asp-for="Entry.Loop.Id" value="@Model.LoopId"/>
             <input type="hidden" asp-for="Entry.Stop.Id" value="@Model.SelectedStopId"/>
             <div>
                 <input type="submit" class="btn btn-primary" id="entry-creator-button" value="Next Stop"/>
-                <a class="btn btn-danger" id="end-trip-button" asp-controller="Driver" asp-action="SelectBusLoop">End Trip</a>
+                <a type="submit" class="btn btn-danger" id="end-trip-button" asp-controller="Driver" asp-action="SelectBusLoop">End Trip</a>
             </div>
         </form>
     </div>
@@ -47,13 +56,11 @@
 @section Scripts {
     <script>
         document.getElementById("entry-creator-form").addEventListener("submit", function (event) {
-            event.preventDefault(); // prevent the default form submission
-
-            // get the form data
+            event.preventDefault();
+    
             const formData = new FormData(event.target);
             console.log("Entry form data: ", formData);
-
-            // make the POST request
+    
             fetch(event.target.action, {
                 method: 'POST',
                 body: formData
@@ -62,14 +69,13 @@
                 if (response.ok) {
                     const stopIdSelect = document.getElementById("selected-stop-id");
                     const nextStopIndex = stopIdSelect.selectedIndex + 1;
-
+    
                     if (nextStopIndex < stopIdSelect.options.length) {
                         stopIdSelect.selectedIndex = nextStopIndex;
                     } else {
                         alert("You have reached the end of the loop. Please start a new trip or end the current trip.");
                     }
-
-                    // Clear input fields
+    
                     document.querySelector("input[name='Entry.Boarded']").value = "";
                     document.querySelector("input[name='Entry.LeftBehind']").value = "";
                 } else {

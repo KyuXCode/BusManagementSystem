@@ -1,7 +1,4 @@
-using System.Collections.Generic;
 using System.Security.Claims;
-using System.Text.Json;
-using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
@@ -34,10 +31,10 @@ namespace BusManagementSystem.Controllers
         }
 
         [Route("Entry")]
-        [Route("Entry/Index")]
         public async Task<IActionResult> Index()
         {
-            return View(_entryServiceInterface.GetEntries());
+            var entries = await _entryServiceInterface.GetEntries();
+            return View(entries);
         }
 
         [HttpPost]
@@ -48,12 +45,12 @@ namespace BusManagementSystem.Controllers
 
             Entry entry = entryCreatorViewModel.Entry;
             entry.Stop = await _stopServiceInterface.GetStop(entryCreatorViewModel.SelectedStopId);
-
-
+            
             string userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
 
             entry.Driver = await _userManager.FindByIdAsync(userId);
 
+            entry.DriverId = userId;
 
             entry.Bus = entryCreatorViewModel.Bus;
             entry.Loop = entryCreatorViewModel.Loop;
@@ -62,34 +59,11 @@ namespace BusManagementSystem.Controllers
             ModelState.Clear();
             TryValidateModel(entryCreatorViewModel.Entry);
 
-
-            if (ModelState.IsValid)
-            {
-                Console.WriteLine("ModelState is valid");
-                _logger.LogInformation("Entry {id} created by {driver} on bus {bus} for stop {stop} at {time}",
-                    entry.Id, entry.Driver.FirstName + " " + entry.Driver.LastName, entry.Bus.BusNumber, entry.Stop.Id,
-                    DateTime.Now);
-                await _entryServiceInterface.AddEntry(entry);
-            }
-            else
-            {
-                foreach (var modelStateEntry in ModelState)
-                {
-                    var key = modelStateEntry.Key;
-                    var errors = modelStateEntry.Value.Errors;
-                    if (errors != null && errors.Count > 0)
-                    {
-                        Console.WriteLine($"Errors for {key}:");
-                        foreach (var error in errors)
-                        {
-                            Console.WriteLine($"- {error.ErrorMessage}");
-                        }
-                    }
-                }
-
-                _logger.LogError("Failed to create entry at {time}", DateTime.Now);
-            }
-
+            _logger.LogInformation("Entry {id} created by {driver} on bus {bus} for stop {stop} at {time}",
+                entry.Id, entry.Driver.FirstName + " " + entry.Driver.LastName, entry.Bus.BusNumber, entry.Stop.Id,
+                DateTime.Now);
+            await _entryServiceInterface.AddEntry(entry);
+            
             return RedirectToAction("EntryCreator", "Driver", new { BusId = entry.Bus.Id, LoopId = entry.Loop.Id });
         }
 

@@ -1,4 +1,5 @@
 using BusManagementSystem.Models;
+using Microsoft.EntityFrameworkCore;
 
 namespace BusManagementSystem.Service;
 
@@ -22,9 +23,14 @@ public class EntryService : IEntryServiceInterface
         await _context.SaveChangesAsync();
     }
 
-    public List<Entry> GetEntries()
+    public async Task<List<Entry>> GetEntries()
     {
-        return _context.Entries.ToList();
+        return await _context.Entries
+            .Include(e => e.Bus)
+            .Include(e => e.Driver)
+            .Include(e => e.Loop)
+            .Include(e => e.Stop)
+            .ToListAsync();
     }
 
     public async Task<Entry> GetEntry(int id)
