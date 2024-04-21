@@ -16,4 +16,7 @@ public interface IRouteServiceInterface
     Task<Loop> GetLoop(int id);
     List<Stop> GetStops();
     List<Route> GetRoutesWithLoopId(int loopId);
+
+    Task MoveRouteUp(int routeId);
+    Task MoveRouteDown(int routeId);
 }

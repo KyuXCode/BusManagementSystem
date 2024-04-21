@@ -99,5 +99,50 @@ public class RouteService : IRouteServiceInterface
     {
         return _context.Routes.Where(r => r.LoopId == loopId).ToList();
     }
+    
+    public async Task MoveRouteUp(int routeId)
+    {
+        var routeToMove = await _context.Routes.FindAsync(routeId);
+        if (routeToMove == null)
+        {
+            throw new Exception("Route not found");
+        }
 
+        var previousRoute = await _context.Routes
+            .Where(r => r.LoopId == routeToMove.LoopId && r.Order < routeToMove.Order)
+            .OrderByDescending(r => r.Order)
+            .FirstOrDefaultAsync();
+
+        if (previousRoute != null)
+        {
+            int tempOrder = routeToMove.Order;
+            routeToMove.Order = previousRoute.Order;
+            previousRoute.Order = tempOrder;
+
+            await _context.SaveChangesAsync();
+        }
+    }
+
+    public async Task MoveRouteDown(int routeId)
+    {
+        var routeToMove = await _context.Routes.FindAsync(routeId);
+        if (routeToMove == null)
+        {
+            throw new Exception("Route not found");
+        }
+
+        var nextRoute = await _context.Routes
+            .Where(r => r.LoopId == routeToMove.LoopId && r.Order > routeToMove.Order)
+            .OrderBy(r => r.Order)
+            .FirstOrDefaultAsync();
+
+        if (nextRoute != null)
+        {
+            int tempOrder = routeToMove.Order;
+            routeToMove.Order = nextRoute.Order;
+            nextRoute.Order = tempOrder;
+
+            await _context.SaveChangesAsync();
+        }
+    }
 }

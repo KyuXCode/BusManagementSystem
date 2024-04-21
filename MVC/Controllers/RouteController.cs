@@ -41,24 +41,6 @@ public class RouteController : Controller
         return View();
     }
 
-    // [HttpPost]
-    // [ValidateAntiForgeryToken]
-    // public async Task<IActionResult> Create([Bind("Id, Order, StopId, LoopId")] Route route)
-    // {
-    //     _logger.LogInformation("Order: {Order}, StopId: {StopId}", route.Order, route.StopId);
-    //     try
-    //     {
-    //         await _routeServiceInterface.AddRoute(route);
-    //         _logger.LogInformation("Added route with id {id} at {time}", route.Id, DateTime.Now);
-    //         return Redirect($"/Route/loop/{route.LoopId}");
-    //     }
-    //     catch (Exception e)
-    //     {
-    //         _logger.LogError("Create failed with exception {exception} at {time}", e.Message, DateTime.Now);
-    //         throw;
-    //     }
-    // }
-
 
     [HttpPost] 
     [Route("Route/loop/{loopId}/Create")]
@@ -102,6 +84,41 @@ public class RouteController : Controller
             return NotFound();
         }
     }
+    
+    [HttpPost]
+    [ValidateAntiForgeryToken]
+    [Route("Route/MoveUp")]
+    public async Task<IActionResult> MoveUp(int routeId, int loopId)
+    {
+        try
+        {
+            await _routeServiceInterface.MoveRouteUp(routeId);
+            return RedirectToAction("Index", new { loopId }); 
+        }
+        catch (Exception ex)
+        {
+            TempData["ErrorMessage"] = "Failed to move route up: " + ex.Message;
+            return RedirectToAction("Index", new { loopId });
+        }
+    }
+
+    [HttpPost]
+    [ValidateAntiForgeryToken]
+    [Route("Route/MoveDown")]
+    public async Task<IActionResult> MoveDown(int routeId, int loopId)
+    {
+        try
+        {
+            await _routeServiceInterface.MoveRouteDown(routeId);
+            return RedirectToAction("Index", new { loopId }); 
+        }
+        catch (Exception ex)
+        {
+            TempData["ErrorMessage"] = "Failed to move route down: " + ex.Message;
+            return RedirectToAction("Index", new { loopId });
+        }
+    }
+
 
     [HttpPost]
     [ValidateAntiForgeryToken]

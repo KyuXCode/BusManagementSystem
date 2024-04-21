@@ -23,58 +23,66 @@
         <table id="bus-table" class="table table-striped">
             <thead>
             <tr>
-                <th>Loop</th>
+                <th>@loop.Name Loop</th>
                 <th>Stop</th>
                 <th>Order</th>
             </tr>
             </thead>
-            <tbody>
-            @foreach (var route in Model)
-            {
-                var stop = await _stopServiceInterface.GetStop(route.StopId);
-
-                <tr>
-                    <td>@loop.Name</td>
-                    <td>@stop.Name</td>
-                    <td>@route.Order</td>
-                    <td>
-                        <a class="btn btn-primary" asp-action="Edit" asp-route-id="@route.Id">Edit</a> |
-                        <asp:Button UseSubmitBehavior="false" class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#deleteRouteModal_@route.Id" runat="server">Delete</asp:Button>
-                    </td>
-                </tr>
-
-                <div class="modal fade" id="deleteRouteModal_@route.Id" tabindex="-1" aria-labelledby="deleteRouteModalLabel" aria-hidden="true">
-                    <div class="modal-dialog modal-dialog-centered">
-                        <div class="modal-content">
-                            <div class="modal-header">
-                                <h5 class="modal-title fs-5" id="deleteStopModalLabel">Delete Stop</h5>
-                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close">
-                                </button>
-                            </div>
-                            <div class="modal-body">
-                                Remove @route.Stop.Name from @route.Loop.Name Loop from the database?
-                            </div>
-                            <div class="modal-footer">
-                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                                <button type="submit" class="btn btn-danger" asp-action="Delete" asp-route-routeId="@route.Id">Confirm</button>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            }
-            </tbody>
+           <tbody>
+               @{
+                   var orderedRoutes = Model.OrderBy(r => r.Order).ToList();
+                   var totalRoutes = orderedRoutes.Count;
+               }
+               @for (int i = 0; i < totalRoutes; i++)
+               {
+                   var route = orderedRoutes[i];
+                   var stop = await _stopServiceInterface.GetStop(route.StopId);
+           
+                   <tr>
+                       <td>
+                           <div class="btn-group" role="group" aria-label="Move buttons">
+                               <form asp-action="MoveUp" method="post">
+                                   <input type="hidden" name="routeId" value="@route.Id"/>
+                                   <input type="hidden" name="loopId" value="@loop.Id"/>
+                                   <button type="submit" class="btn btn-secondary rounded-start me-2" @(i == 0 ? "disabled" : "")>Move Up</button>
+                               </form>
+                               <form asp-action="MoveDown" method="post">
+                                   <input type="hidden" name="routeId" value="@route.Id"/>
+                                   <input type="hidden" name="loopId" value="@loop.Id"/>
+                                   <button type="submit" class="btn btn-secondary rounded-end" @(i == totalRoutes - 1 ? "disabled" : "")>Move Down</button>
+                               </form>
+                           </div>
+                       </td>
+                       <td>@stop.Name</td>
+                       <td>@route.Order</td>
+                       <td>
+                           <asp:Button UseSubmitBehavior="false" class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#deleteRouteModal_@route.Id" runat="server">Delete</asp:Button>
+                       </td>
+                   </tr>
+           
+                   <div class="modal fade" id="deleteRouteModal_@route.Id" tabindex="-1" aria-labelledby="deleteRouteModalLabel" aria-hidden="true">
+                       <div class="modal-dialog modal-dialog-centered">
+                           <div class="modal-content">
+                               <div class="modal-header">
+                                   <h5 class="modal-title fs-5" id="deleteStopModalLabel">Delete Stop</h5>
+                                   <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close">
+                                   </button>
+                               </div>
+                               <div class="modal-body">
+                                   Remove @route.Stop.Name from @route.Loop.Name Loop from the database?
+                               </div>
+                               <div class="modal-footer">
+                                   <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                                   <button type="submit" class="btn btn-danger" asp-action="Delete" asp-route-routeId="@route.Id">Confirm</button>
+                               </div>
+                           </div>
+                       </div>
+                   </div>
+               }
+           </tbody>
         </table>
     </form>
 </div>
-
-<!-- Create Bus Modal -->
-@* @await Html.PartialAsync("_CreateBusModal", new BusManagementSystem.Models.Bus()) *@
-
-@* <!-- Delete Bus Modal --> *@
-@* @await Html.PartialAsync("_DeleteBusModal") *@
-@* *@
-@* <!-- Edit Bus Modal --> *@
-@* @await Html.PartialAsync("_EditBusModal", new BusManagementSystem.Models.Bus()) *@
 
 
 @section Scripts {
