@@ -5,7 +5,7 @@ using BusManagementSystem.Service;
 
 namespace MVC.Tests;
 
-public class EntryRepoTests
+public class EntryServiceTests
 {
     Driver driver = new Driver()
     {

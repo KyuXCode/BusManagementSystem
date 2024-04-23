@@ -4,7 +4,7 @@ using BusManagementSystem.Service;
 
 namespace MVC.Tests;
 
-public class BusRepoTests
+public class BusServiceTests
 {
     private BusContext GetDbContext()
     {

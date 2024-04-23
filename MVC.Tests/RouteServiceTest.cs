@@ -5,7 +5,7 @@ using BusManagementSystem.Service;
 
 namespace MVC.Tests;
 
-public class RouteRepoTests
+public class RouteServiceTests  
 {
     Stop stop = new Stop()
     {
