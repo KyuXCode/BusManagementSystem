@@ -5,6 +5,8 @@ VisualStudioVersion = 17.0.31903.59
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BusManagementSystem", "MVC\BusManagementSystem.csproj", "{D77864E2-EC09-4D73-A2A1-74DBCA8BD771}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MVC.Tests", "MVC.Tests\MVC.Tests.csproj", "{FEE69CFF-48E2-4877-8E7C-CE667975AA61}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -18,5 +20,9 @@ Global
 		{D77864E2-EC09-4D73-A2A1-74DBCA8BD771}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{D77864E2-EC09-4D73-A2A1-74DBCA8BD771}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{D77864E2-EC09-4D73-A2A1-74DBCA8BD771}.Release|Any CPU.Build.0 = Release|Any CPU
+		{FEE69CFF-48E2-4877-8E7C-CE667975AA61}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{FEE69CFF-48E2-4877-8E7C-CE667975AA61}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{FEE69CFF-48E2-4877-8E7C-CE667975AA61}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{FEE69CFF-48E2-4877-8E7C-CE667975AA61}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal

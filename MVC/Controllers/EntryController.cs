@@ -103,17 +103,13 @@ namespace BusManagementSystem.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed()
         {
-            // Retrieve the "ids" parameter from the query string
             var idsString = Request.Query["ids"];
 
-            // Check if the "ids" parameter is provided
             if (string.IsNullOrEmpty(idsString))
             {
-                // No IDs provided, return an error response or handle the situation accordingly
                 return BadRequest("No IDs provided for deletion.");
             }
 
-            // Split the string of IDs by comma and convert them into integers
             var ids = idsString
                 .ToString()
                 .Split(',', StringSplitOptions.RemoveEmptyEntries)

@@ -57,22 +57,18 @@ public class BusController : Controller
             return NotFound();
         }
 
-        if (ModelState.IsValid)
-        {
-            try
-            {
-                await _busServiceInterface.UpdateBus(bus);
-                _logger.LogInformation("Edited bus with id {id} at {time}", bus.Id, DateTime.Now);
-                return RedirectToAction("Index");
-            }
-            catch (Exception e)
-            {
-                _logger.LogError("Edit Failed with exception {exception} at {time}.", e.Message, DateTime.Now);
-                return NotFound();
-            }
-        }
 
-        return View(bus);
+        try
+        {
+            await _busServiceInterface.UpdateBus(bus);
+            _logger.LogInformation("Edited bus with id {id} at {time}", bus.Id, DateTime.Now);
+            return RedirectToAction("Index");
+        }
+        catch (Exception e)
+        {
+            _logger.LogError("Edit Failed with exception {exception} at {time}.", e.Message, DateTime.Now);
+            return NotFound();
+        }
     }
 
 
