@@ -28,14 +28,11 @@ public class BusControllerTests
     [Fact]
     public async Task TestIndexReturnsViewWithListOfBuses()
     {
-        // Arrange
         var busService = GetInMemoryService();
         var busController = new BusController(busService, GetLogger());
 
-        // Act
         var result = busController.Index() as ViewResult;
 
-        // Assert
         Assert.NotNull(result);
         Assert.IsAssignableFrom<List<Bus>>(result.Model);
         Assert.Empty((List<Bus>)result.Model);
@@ -45,15 +42,12 @@ public class BusControllerTests
     [InlineData(222, true)]
     public async Task TestCreateReturnsRedirectToActionIndex(int busNumber, bool expectRedirect)
     {
-        // Arrange
         var busService = GetInMemoryService();
         var busController = new BusController(busService, GetLogger());
         var bus = new Bus { BusNumber = busNumber };
 
-        // Act
         var result = await busController.Create(bus) as RedirectToActionResult;
 
-        // Assert
         if (expectRedirect)
         {
             Assert.NotNull(result);
@@ -70,36 +64,46 @@ public class BusControllerTests
     [Fact]
     public async Task TestEditReturnsRedirectToActionIndexOnSuccess()
     {
-        // Arrange
         var busService = GetInMemoryService();
         var busController = new BusController(busService, GetLogger());
         var bus = new Bus { BusNumber = 123 };
         var busId = await busService.AddBus(bus);
+        bus.BusNumber = 222;
 
-        // Act
         var result = await busController.Edit(busId, bus) as RedirectToActionResult;
 
-        // Assert
         Assert.NotNull(result);
         Assert.Equal("Index", result.ActionName);
         Assert.Single(busService.GetBuses());
-        Assert.Equal(123, (await busService.GetBus(busId)).BusNumber);
+        Assert.Equal(222, (await busService.GetBus(busId)).BusNumber);
     }
 
     [Fact]
     public async Task TestEditConfirmedMismatchedCode()
     {
-        // Arrange
         var busService = GetInMemoryService();
         var busController = new BusController(busService, GetLogger());
         var bus = new Bus { BusNumber = 123 };
         var busId = await busService.AddBus(bus);
         var mismatchedId = busId * 10;
 
-        // Act
         var result = await busController.Edit(mismatchedId, bus) as ActionResult;
 
-        // Assert
         Assert.IsType<NotFoundResult>(result);
+    }
+    
+    [Fact]
+    public async Task TestDeleteReturnsRedirectToActionIndexOnSuccess()
+    {
+        var busService = GetInMemoryService();
+        var busController = new BusController(busService, GetLogger());
+        var bus = new Bus { BusNumber = 123 };
+        var busId = await busService.AddBus(bus);
+
+        var result = await busController.Delete(busId) as RedirectToActionResult;
+
+        Assert.NotNull(result);
+        Assert.Equal("Index", result.ActionName);
+        Assert.Empty(busService.GetBuses());
     }
 }

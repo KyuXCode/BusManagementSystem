@@ -87,7 +87,7 @@ public class RouteServiceTests
         var route = new Route { Order = 1, Stop = stop, Loop = loop };
         var routeId = await service.AddRoute(route);
 
-        await service.DeleteRoutes(routeId);
+        await service.DeleteRoute(routeId);
         var remainingRoutes = service.GetRoutes();
 
         Assert.Empty(remainingRoutes);

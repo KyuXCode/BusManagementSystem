@@ -93,6 +93,7 @@ public class RouteController : Controller
         try
         {
             await _routeServiceInterface.MoveRouteUp(routeId);
+            _logger.LogInformation("Moved route: {routeId} up at {time}", routeId, DateTime.Now);
             return RedirectToAction("Index", new { loopId }); 
         }
         catch (Exception ex)
@@ -110,6 +111,7 @@ public class RouteController : Controller
         try
         {
             await _routeServiceInterface.MoveRouteDown(routeId);
+            _logger.LogInformation("Moved route: {routeId} down at {time}", routeId, DateTime.Now);
             return RedirectToAction("Index", new { loopId }); 
         }
         catch (Exception ex)
@@ -125,9 +127,11 @@ public class RouteController : Controller
     public async Task<IActionResult> Delete(int routeId)
     {
         var route = await _routeServiceInterface.GetRoute(routeId);
+        var loopId = route.LoopId;
+        // _logger.LogInformation("Hello");
         try
         {
-            await _routeServiceInterface.DeleteRoutes(routeId);
+            await _routeServiceInterface.DeleteRoute(routeId);
             _logger.LogInformation("Deleted route with id {routeId} at {time}", routeId, DateTime.Now);
         }
         catch (Exception e)
@@ -136,6 +140,6 @@ public class RouteController : Controller
             return NotFound();
         }
 
-        return Redirect($"/Route/loop/{route.LoopId}");
+        return Redirect($"/Route/loop/{loopId}");
     }
 }

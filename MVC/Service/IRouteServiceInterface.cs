@@ -10,7 +10,7 @@ public interface IRouteServiceInterface
     Task<Route> GetRoute(int id);
     Task<int> AddRoute(Route route);
     Task<Route> UpdateRoute(Route route);
-    Task<Route> DeleteRoutes(int id);
+    Task<Route> DeleteRoute(int id);
     Task RemoveRoutesByLoopId(int loopId);
     List<Loop> GetLoops();
     Task<Loop> GetLoop(int id);

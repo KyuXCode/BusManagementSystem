@@ -59,7 +59,7 @@ public class RouteService : IRouteServiceInterface
         return selectedRoute;
     }
 
-    public async Task<Route> DeleteRoutes(int id)
+    public async Task<Route> DeleteRoute(int id)
     {
         var selectedRoute = await _context.Routes.FindAsync(id);
         if (selectedRoute == null)

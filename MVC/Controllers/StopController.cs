@@ -19,7 +19,7 @@ public class StopController : Controller
         _logger = logger;
     }
 
-    public async Task<IActionResult> Index()
+    public IActionResult Index()
     {
         var stops = _stopServiceInterface.GetStops();
         return View(stops);
