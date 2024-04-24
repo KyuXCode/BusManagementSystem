@@ -45,7 +45,7 @@ namespace MVC.Tests
         {
             var loopService = GetInMemoryService();
             var loopController = new LoopController(loopService, GetLogger());
-            var loop = new Loop { Name = "Green" };
+            var loop = new Loop { Name = loopName };
 
             var result = await loopController.Create(loop) as RedirectToActionResult;
 
