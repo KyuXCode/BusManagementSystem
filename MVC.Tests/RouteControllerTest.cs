@@ -91,26 +91,27 @@ namespace BusManagementSystem.Tests
         }
 
 
-        //
-        // [Fact]
-        // public async Task TestDelete()
-        // {
-        //     var mockRouteService = new Mock<IRouteServiceInterface>();
-        //     var mockLogger = new Mock<ILogger<RouteController>>();
-        //     var controller = new RouteController(mockRouteService.Object, mockLogger.Object);
-        //     var routeId = 1;
-        //     var loopId = 1;
-        //     var route = new Route { Id = routeId, LoopId = loopId }; 
-        //
-        //     mockRouteService.Setup(s => s.GetRoute(routeId)).ReturnsAsync(route);
-        //
-        //     var result = await controller.Delete(routeId) as RedirectResult;
-        //
-        //     Assert.NotNull(result);
-        //     Assert.Equal($"/Route/loop/{loopId}", result.Url);
-        //     mockRouteService.Verify(s => s.DeleteRoutes(routeId), Times.Once);
-        //     mockLogger.Verify(l => l.LogInformation(It.IsAny<string>(), It.IsAny<int>(), It.IsAny<DateTime>()), Times.Once);
-        // }
+        [Fact]
+        public async Task TestDeleteReturnsRedirectToActionIndex()
+        {
+            var routeId = 1;
+            var loopId = 1;
+            var route = new Route { Id = routeId, LoopId = loopId };
+            
+            var mockRouteService = new Mock<IRouteServiceInterface>();
+            var mockLogger = new Mock<ILogger<RouteController>>();
+            mockRouteService.Setup(service => service.DeleteRoute(routeId));
+            var controller = new RouteController(mockRouteService.Object, mockLogger.Object); ;
+          
+
+            mockRouteService.Setup(s => s.GetRoute(routeId)).ReturnsAsync(route);
+
+            var result = await controller.Delete(routeId) as RedirectResult;
+
+            Assert.NotNull(result);
+            Assert.Equal($"/Route/loop/{loopId}", result.Url);
+            mockRouteService.Verify(s => s.DeleteRoute(routeId), Times.Once);
+        }
         
         
         [Fact]
